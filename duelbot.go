@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
-	"time"
 )
 
 //PlayerList is the return payload of the API that contains all the players and thier spell deck.
 type PlayerList struct {
 	PlayerName string
-	SpellLists []string
+	SpellLists SpellList
 }
 
 //Spells is a struct for stroing the spells
@@ -51,8 +50,6 @@ func GetRandomSpells(numberOfSpells int) SpellList {
 		return chosenSpells
 	}
 
-	rand.Seed(time.Now().Unix()) //Initialize global pseudo random generator
-
 	//Add i random spells to the spell array
 	for i := 0; i < numberOfSpells; i++ {
 		spellNumber := rand.Intn(len(spells))
@@ -62,9 +59,24 @@ func GetRandomSpells(numberOfSpells int) SpellList {
 	return chosenSpells
 }
 
+//CreateMatch returns an array of PlayerList structs which contain every player and their spell list
+func CreateMatch(numberOfPlayers int, numberOfSpells int) []PlayerList {
+
+	matchPayload := make([]PlayerList, numberOfPlayers)
+
+	for i := 0; i < numberOfPlayers; i++ {
+		currentPlayer := &matchPayload[i]
+		currentPlayer.PlayerName = fmt.Sprintf("Player %d", i)
+		currentPlayer.SpellLists = GetRandomSpells(numberOfSpells)
+	}
+
+	return matchPayload
+}
+
 func main() {
-	spells := GetRandomSpells(3)
-	for i := 0; i < len(spells.SpellArray); i++ {
-		fmt.Println(spells.SpellArray[i].Name, ":", spells.SpellArray[i].Effect)
+	match := CreateMatch(5, 3)
+	for i := 0; i < len(match); i++ {
+		fmt.Println(match[i].PlayerName)
+		fmt.Println(match[i].SpellLists)
 	}
 }
